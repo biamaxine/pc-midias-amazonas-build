@@ -1,0 +1,40 @@
+services:
+  db:
+    build: ./db
+    container_name: build-db
+    restart: always
+    tty: true
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=build
+
+  api:
+    build: ./api
+    entrypoint: ./entrypoint.sh
+    container_name: build-api
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    volumes:
+      - ./api:/home/node/api
+    depends_on:
+      - db
+    # user: root
+    # command: yarn entrypoint:enable
+
+  app:
+    build: ./app
+    entrypoint: ./entrypoint.sh
+    container_name: build-app
+    ports:
+      - "443:443"
+    volumes:
+      - ./app:/home/node/app
+    depends_on:
+      - api
+    # user: root
+    # command: yarn entrypoint:enable
