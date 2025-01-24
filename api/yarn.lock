@@ -1708,7 +1708,7 @@ anymatch@^3.0.3, anymatch@~3.1.2:
     "@nestjs/serve-static" "^4.0.2"
     "@nestjs/swagger" "^8.1.0"
     "@prisma/client" "6.1.0"
-    api "file:../../../usr/local/share/.cache/yarn/v6/npm-api-0.0.1-646afa8a-1eff-4884-83b0-f37ff1326891-1737646197393/node_modules/api"
+    api "file:../../../usr/local/share/.cache/yarn/v6/npm-api-0.0.1-f3ec128a-87b2-41b3-8948-2e738f50f8d9-1737726226626/node_modules/api"
     bcrypt "^5.1.1"
     class-transformer "^0.5.1"
     class-validator "^0.14.1"
@@ -5631,7 +5631,7 @@ preview-email@^3.0.19:
     pug "^3.0.3"
     uuid "^9.0.1"
 
-prisma@^6.1.0:
+prisma@^6.2.1:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/prisma/-/prisma-6.2.1.tgz#457b210326d66d0e6f583cc6f9cd2819b984408f"
   integrity sha512-hhyM0H13pQleQ+br4CkzGizS5I0oInoeTw3JfLw1BRZduBSQxPILlJLwi+46wZzj9Je7ndyQEMGw/n5cN2fknA==
