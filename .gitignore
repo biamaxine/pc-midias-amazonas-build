@@ -1,3 +1,11 @@
-/**/db_data
-/**/node_modules
-/**/.env
+# db
+db/db_data
+
+# api
+/api/.env
+/api/makefile
+/api/node_modules
+/api/uploads
+
+# app
+/app/makefile
