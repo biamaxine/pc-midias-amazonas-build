@@ -16,6 +16,5 @@ export declare class MediaService {
     upload(email: string, file: Express.Multer.File): Promise<DefaultResponse<string>>;
     createAccess({ filename, url, email, }: MediaCreateAccess): Promise<DefaultResponse>;
     read(res: Response, token: string): Promise<DefaultResponse>;
-    private createWaterMark;
     private generateHTML;
 }
