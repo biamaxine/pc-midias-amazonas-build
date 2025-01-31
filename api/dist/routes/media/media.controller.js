@@ -22,8 +22,8 @@ const default_exception_1 = require("../../shared/classes/default-exception");
 const swagger_global_1 = require("../../shared/constants/swagger.global");
 const email_guard_1 = require("../../shared/guards/email.guard");
 const media_swagger_1 = require("./constants/media.swagger");
-const media_service_1 = require("./media.service");
 const media_create_acess_dto_1 = require("./dto/media-create-acess.dto");
+const media_service_1 = require("./media.service");
 const swagger = {
     uploadMedia: {
         interceptors: {
@@ -54,10 +54,14 @@ const swagger = {
             schema: {
                 type: 'object',
                 properties: {
-                    'File:': {
+                    'file:': {
                         type: 'string',
                         format: 'binary',
                         description: 'Mídia precisa estar em formato `.mp4`',
+                    },
+                    'metadata:': {
+                        type: 'string',
+                        description: 'Metadados do vídeo em como JSON.stringify()',
                     },
                 },
             },
@@ -68,15 +72,18 @@ let MediaController = class MediaController {
     constructor(service) {
         this.service = service;
     }
-    UPLOAD(email, file) {
+    UPLOAD(email, file, metadata) {
         console.log({ email });
-        return this.service.upload(email, file);
+        return this.service.upload(email, file, metadata);
     }
     CREATE_ACCESS(dto) {
         return this.service.createAccess(dto);
     }
     READ(res, token) {
         return this.service.read(res, token);
+    }
+    READ_METADATA(token) {
+        return this.service.readMetadata(token);
     }
 };
 exports.MediaController = MediaController;
@@ -96,8 +103,9 @@ __decorate([
     (0, swagger_1.ApiInternalServerErrorResponse)(media_swagger_1.mediaApiResponse.upload.INTERNAL_SERVER_ERROR),
     __param(0, (0, common_1.Param)('email')),
     __param(1, (0, common_1.UploadedFile)()),
+    __param(2, (0, common_1.Body)('metadata')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, String]),
     __metadata("design:returntype", Promise)
 ], MediaController.prototype, "UPLOAD", null);
 __decorate([
@@ -112,12 +120,27 @@ __decorate([
 ], MediaController.prototype, "CREATE_ACCESS", null);
 __decorate([
     (0, common_1.Get)('access/:token'),
+    (0, swagger_1.ApiOkResponse)(),
+    (0, swagger_1.ApiUnauthorizedResponse)(swagger_global_1.globalApiReponse.ACCESS_DENIED),
+    (0, swagger_1.ApiNotFoundResponse)(media_swagger_1.mediaApiResponse.read.NOT_FOUND),
+    (0, swagger_1.ApiInternalServerErrorResponse)(media_swagger_1.mediaApiResponse.read.INTERNAL_SERVER_ERROR),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Param)('token')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], MediaController.prototype, "READ", null);
+__decorate([
+    (0, common_1.Get)('metadata/:token'),
+    (0, swagger_1.ApiOkResponse)(media_swagger_1.mediaApiResponse.readMetadata.OK),
+    (0, swagger_1.ApiUnauthorizedResponse)(swagger_global_1.globalApiReponse.ACCESS_DENIED),
+    (0, swagger_1.ApiNotFoundResponse)(media_swagger_1.mediaApiResponse.read.NOT_FOUND),
+    (0, swagger_1.ApiInternalServerErrorResponse)(media_swagger_1.mediaApiResponse.read.INTERNAL_SERVER_ERROR),
+    __param(0, (0, common_1.Param)('token')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MediaController.prototype, "READ_METADATA", null);
 exports.MediaController = MediaController = __decorate([
     (0, common_1.Controller)('media'),
     __metadata("design:paramtypes", [media_service_1.MediaService])

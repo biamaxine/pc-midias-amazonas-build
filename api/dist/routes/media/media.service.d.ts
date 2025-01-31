@@ -13,8 +13,11 @@ export declare class MediaService {
     private readonly mailer;
     private readonly VIEW;
     constructor(repository: MediaRepository, USER: UserRepository, auth: AuthService, mailer: MailerService, VIEW: ViewRepository);
-    upload(email: string, file: Express.Multer.File): Promise<DefaultResponse<string>>;
+    upload(email: string, file: Express.Multer.File, metadata: string): Promise<DefaultResponse<string>>;
     createAccess({ filename, url, email, }: MediaCreateAccess): Promise<DefaultResponse>;
-    read(res: Response, token: string): Promise<DefaultResponse>;
+    readMetadata(token: string): Promise<DefaultResponse>;
+    read(res: Response, token: string): Promise<void>;
+    private createWaterMark;
     private generateHTML;
+    private getMediaPath;
 }

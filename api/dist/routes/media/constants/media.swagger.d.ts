@@ -14,4 +14,11 @@ export declare const mediaApiResponse: {
         NOT_FOUND: import("@nestjs/swagger").ApiResponseOptions;
         INTERNAL_SERVER_ERROR: import("@nestjs/swagger").ApiResponseOptions;
     };
+    read: {
+        NOT_FOUND: import("@nestjs/swagger").ApiResponseOptions;
+        INTERNAL_SERVER_ERROR: import("@nestjs/swagger").ApiResponseOptions;
+    };
+    readMetadata: {
+        OK: import("@nestjs/swagger").ApiResponseOptions;
+    };
 };

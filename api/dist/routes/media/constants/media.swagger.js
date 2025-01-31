@@ -40,5 +40,18 @@ exports.mediaApiResponse = {
             'Não foi possível enviar o email de resposta à solicitação.',
         ]),
     },
+    read: {
+        NOT_FOUND: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.NOT_FOUND, [
+            'Mídia não foi encontrada.',
+        ]),
+        INTERNAL_SERVER_ERROR: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.INTERNAL_SERVER_ERROR, [
+            'Mídia registrada no DB mas não foi encontrada nos arquivos.',
+        ]),
+    },
+    readMetadata: {
+        OK: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.OK, ['Metadados de mídia.'], {
+            data: '{"duration":7.638567,"width":0,"height":0}',
+        }),
+    },
 };
 //# sourceMappingURL=media.swagger.js.map

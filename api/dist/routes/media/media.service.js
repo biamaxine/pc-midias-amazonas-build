@@ -12,11 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MediaService = void 0;
 const mailer_1 = require("@nestjs-modules/mailer");
 const common_1 = require("@nestjs/common");
+const ffmpeg = require("fluent-ffmpeg");
 const fs = require("fs");
 const path = require("path");
 const auth_service_1 = require("../../auth/auth.service");
 const default_exception_1 = require("../../shared/classes/default-exception");
 const default_response_1 = require("../../shared/classes/default-response");
+const stream_1 = require("stream");
 const uuid = require("uuid");
 const user_repository_1 = require("../user/user.repository");
 const view_repository_1 = require("../view/view.repository");
@@ -29,10 +31,11 @@ let MediaService = class MediaService {
         this.mailer = mailer;
         this.VIEW = VIEW;
     }
-    async upload(email, file) {
+    async upload(email, file, metadata) {
+        console.log(metadata);
         const user = (await this.USER.read({ email }));
         const filename = `${uuid.v4()}.mp4`;
-        await this.repository.create({ authorId: user.id, filename });
+        await this.repository.create({ authorId: user.id, filename, metadata });
         await fs.promises.rename(file.path, `./uploads/${filename}`);
         return new default_response_1.DefaultResponse({
             message: 'Mídia de Depoimento foi adicionada com sucesso.',
@@ -76,29 +79,44 @@ let MediaService = class MediaService {
             });
         }
     }
-    async read(res, token) {
-        const payload = this.auth.decodeTokenAccess(token);
-        const { email, data } = payload;
-        if (!data.filename)
-            throw new default_exception_1.DefaultException({
-                message: 'Acesso negado.',
-                status: common_1.HttpStatus.UNAUTHORIZED,
-            });
-        const user = (await this.USER.read({ email }));
-        const media = {
-            data: await this.repository.read({ filename: data.filename }),
-            path: path.join(__dirname, '..', '..', '..', 'uploads', data.filename),
-        };
-        await this.VIEW.create({ userId: user.id, mediaId: media.data.id });
-        media.stream = fs.createReadStream(media.path);
-        res.set({
-            'Content-Type': 'video/mp4',
-            'Content-Length': fs.statSync(media.path).size,
-        });
-        media.stream.pipe(res);
+    async readMetadata(token) {
+        const { data } = this.auth.decodeTokenAccess(token);
+        await this.getMediaPath(data.filename);
+        const media = await this.repository.read({ filename: data.filename });
         return new default_response_1.DefaultResponse({
-            message: 'Mídia de Depoimento está sendo exibida ao Usuário.',
+            message: 'Metadados de mídia.',
             status: common_1.HttpStatus.OK,
+            data: media.metadata,
+            token,
+        });
+    }
+    async read(res, token) {
+        const { email, data } = this.auth.decodeTokenAccess(token);
+        const media_path = await this.getMediaPath(data.filename);
+        const user = (await this.USER.read({ email }));
+        const media = await this.repository.read({ filename: data.filename });
+        const watermarkStream = await this.createWaterMark(media_path, email);
+        await this.VIEW.create({ userId: user.id, mediaId: media.id });
+        res.setHeader('Content-Type', 'video/mp4');
+        watermarkStream.pipe(res);
+    }
+    async createWaterMark(videoPath, watermarkText) {
+        return new Promise((resolve, reject) => {
+            const output = new stream_1.PassThrough();
+            const quicksand = path.join(__dirname, '..', '..', '..', 'fonts', 'Quicksand-Regular.ttf');
+            ffmpeg(videoPath)
+                .outputOptions('-movflags', 'frag_keyframe+empty_moov')
+                .videoCodec('libx264')
+                .format('mp4')
+                .videoFilters(`drawtext=fontfile=${quicksand}:text='${watermarkText}':fontsize=24:fontcolor=black@0.1:x=(w-text_w)/2:y=(h-text_h)/2`)
+                .on('start', () => console.log('Adding watermark to video...'))
+                .on('error', err => {
+                console.error('Error while processing video:', err);
+                reject(err);
+            })
+                .on('end', () => console.log('Watermarked video ready.'))
+                .pipe(output);
+            resolve(output);
         });
     }
     generateHTML(url, token) {
@@ -112,6 +130,22 @@ let MediaService = class MediaService {
       <hr>
       <p> Caso não tenha realizado esta solicitação, por favor, ignore este email. </p>
     `;
+    }
+    async getMediaPath(filename) {
+        if (!filename)
+            throw new default_exception_1.DefaultException({
+                message: 'Acesso negado.',
+                status: common_1.HttpStatus.UNAUTHORIZED,
+            });
+        const media_path = path.join(__dirname, '..', '..', '..', 'uploads', filename);
+        if (!fs.existsSync(media_path)) {
+            await this.repository.delete({ filename });
+            throw new default_exception_1.DefaultException({
+                message: 'Mídia registrada no DB mas não foi encontrada nos arquivos.',
+                status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+            });
+        }
+        return media_path;
     }
 };
 exports.MediaService = MediaService;

@@ -46,6 +46,8 @@ model Media {
   author User @relation(fields: [authorId], references: [id])
   authorId String
 
+  metadata String @db.VarChar(255)
+
   views View[]
 
   uploadedAt DateTime @default(now())
