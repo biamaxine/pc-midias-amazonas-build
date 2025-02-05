@@ -25,7 +25,7 @@ const media_swagger_1 = require("./constants/media.swagger");
 const media_create_acess_dto_1 = require("./dto/media-create-acess.dto");
 const media_service_1 = require("./media.service");
 const swagger = {
-    uploadMedia: {
+    upload: {
         interceptors: {
             file_interceptor: (0, platform_express_1.FileInterceptor)('file', {
                 storage: (0, multer_1.diskStorage)({
@@ -67,6 +67,14 @@ const swagger = {
             },
         },
     },
+    check: {
+        param: {
+            filename: {
+                name: 'filename',
+                example: 'nome_de_arquivo_sem_extensao',
+            },
+        },
+    },
 };
 let MediaController = class MediaController {
     constructor(service) {
@@ -79,6 +87,9 @@ let MediaController = class MediaController {
     CREATE_ACCESS(dto) {
         return this.service.createAccess(dto);
     }
+    CHECK(filename) {
+        return this.service.check(filename);
+    }
     READ(res, token) {
         return this.service.read(res, token);
     }
@@ -89,13 +100,13 @@ let MediaController = class MediaController {
 exports.MediaController = MediaController;
 __decorate([
     (0, common_1.Post)('me/:email/upload'),
-    (0, common_1.UseInterceptors)(swagger.uploadMedia.interceptors.file_interceptor),
+    (0, common_1.UseInterceptors)(swagger.upload.interceptors.file_interceptor),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)(email_guard_1.EmailGuard),
     (0, swagger_1.ApiParam)(swagger_global_1.globalApiParam.email),
-    (0, swagger_1.ApiBody)(swagger.uploadMedia.apiBody),
+    (0, swagger_1.ApiBody)(swagger.upload.apiBody),
     (0, swagger_1.ApiOkResponse)(media_swagger_1.mediaApiResponse.upload.OK),
     (0, swagger_1.ApiBadRequestResponse)(swagger_global_1.globalApiReponse.AUTHENTICATION_NOT_PROVIDED),
     (0, swagger_1.ApiUnauthorizedResponse)(swagger_global_1.globalApiReponse.ACCESS_DENIED),
@@ -111,7 +122,7 @@ __decorate([
 __decorate([
     (0, common_1.Post)('create-access'),
     (0, swagger_1.ApiCreatedResponse)(media_swagger_1.mediaApiResponse.createMediaAcess.CREATED),
-    (0, swagger_1.ApiNotFoundResponse)(media_swagger_1.mediaApiResponse.createMediaAcess.NOT_FOUND),
+    (0, swagger_1.ApiNotFoundResponse)(swagger_global_1.globalApiReponse.MEDIA_NOT_FOUND),
     (0, swagger_1.ApiInternalServerErrorResponse)(media_swagger_1.mediaApiResponse.createMediaAcess.INTERNAL_SERVER_ERROR),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -119,10 +130,22 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], MediaController.prototype, "CREATE_ACCESS", null);
 __decorate([
+    (0, common_1.Get)('check/:filename'),
+    (0, swagger_1.ApiOkResponse)(media_swagger_1.mediaApiResponse.check.OK),
+    (0, swagger_1.ApiBadRequestResponse)(media_swagger_1.mediaApiResponse.check.BAD_REQUEST),
+    (0, swagger_1.ApiNotFoundResponse)(swagger_global_1.globalApiReponse.MEDIA_NOT_FOUND),
+    (0, swagger_1.ApiInternalServerErrorResponse)(media_swagger_1.mediaApiResponse.check.INTERNAL_SERVER_ERROR),
+    (0, swagger_1.ApiParam)(swagger.check.param.filename),
+    __param(0, (0, common_1.Param)('filename')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MediaController.prototype, "CHECK", null);
+__decorate([
     (0, common_1.Get)('access/:token'),
     (0, swagger_1.ApiOkResponse)(),
     (0, swagger_1.ApiUnauthorizedResponse)(swagger_global_1.globalApiReponse.ACCESS_DENIED),
-    (0, swagger_1.ApiNotFoundResponse)(media_swagger_1.mediaApiResponse.read.NOT_FOUND),
+    (0, swagger_1.ApiNotFoundResponse)(swagger_global_1.globalApiReponse.MEDIA_NOT_FOUND),
     (0, swagger_1.ApiInternalServerErrorResponse)(media_swagger_1.mediaApiResponse.read.INTERNAL_SERVER_ERROR),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Param)('token')),
@@ -134,7 +157,7 @@ __decorate([
     (0, common_1.Get)('metadata/:token'),
     (0, swagger_1.ApiOkResponse)(media_swagger_1.mediaApiResponse.readMetadata.OK),
     (0, swagger_1.ApiUnauthorizedResponse)(swagger_global_1.globalApiReponse.ACCESS_DENIED),
-    (0, swagger_1.ApiNotFoundResponse)(media_swagger_1.mediaApiResponse.read.NOT_FOUND),
+    (0, swagger_1.ApiNotFoundResponse)(swagger_global_1.globalApiReponse.MEDIA_NOT_FOUND),
     (0, swagger_1.ApiInternalServerErrorResponse)(media_swagger_1.mediaApiResponse.read.INTERNAL_SERVER_ERROR),
     __param(0, (0, common_1.Param)('token')),
     __metadata("design:type", Function),

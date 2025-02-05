@@ -79,6 +79,39 @@ let MediaService = class MediaService {
             });
         }
     }
+    async check(filename) {
+        if (!uuid.validate(filename)) {
+            throw new default_exception_1.DefaultException({
+                message: 'Nome de mídia inválido.',
+                status: common_1.HttpStatus.BAD_REQUEST,
+            });
+        }
+        filename = `${filename}.mp4`;
+        await this.repository.read({ filename });
+        const media_path = path.join(__dirname, '..', '..', '..', 'uploads', filename);
+        if (!fs.existsSync(media_path)) {
+            await this.repository.delete({ filename });
+            throw new default_exception_1.DefaultException({
+                message: 'Mídia registrada no DB mas não foi encontrada nos arquivos.',
+                status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+            });
+        }
+        return new default_response_1.DefaultResponse({
+            message: 'Verificação de Mídia: SUCESSO.',
+            status: common_1.HttpStatus.OK,
+        });
+    }
+    async read(res, token) {
+        const { email, data } = this.auth.decodeTokenAccess(token);
+        const media_path = await this.getMediaPath(data.filename);
+        const user = (await this.USER.read({ email }));
+        const media = await this.repository.read({ filename: data.filename });
+        const { width, height } = JSON.parse(media.metadata);
+        const watermarkStream = await this.createWaterMark(media_path, email, width, height);
+        await this.VIEW.create({ userId: user.id, mediaId: media.id });
+        res.setHeader('Content-Type', 'video/mp4');
+        watermarkStream.pipe(res);
+    }
     async readMetadata(token) {
         const { data } = this.auth.decodeTokenAccess(token);
         await this.getMediaPath(data.filename);
@@ -90,25 +123,16 @@ let MediaService = class MediaService {
             token,
         });
     }
-    async read(res, token) {
-        const { email, data } = this.auth.decodeTokenAccess(token);
-        const media_path = await this.getMediaPath(data.filename);
-        const user = (await this.USER.read({ email }));
-        const media = await this.repository.read({ filename: data.filename });
-        const watermarkStream = await this.createWaterMark(media_path, email);
-        await this.VIEW.create({ userId: user.id, mediaId: media.id });
-        res.setHeader('Content-Type', 'video/mp4');
-        watermarkStream.pipe(res);
-    }
-    async createWaterMark(videoPath, watermarkText) {
+    async createWaterMark(videoPath, watermarkText, width, height) {
         return new Promise((resolve, reject) => {
             const output = new stream_1.PassThrough();
             const quicksand = path.join(__dirname, '..', '..', '..', 'fonts', 'Quicksand-Regular.ttf');
+            const fontsize = width > height ? '(h-text_h)*0.05' : '(w-text_w)*0.05';
             ffmpeg(videoPath)
                 .outputOptions('-movflags', 'frag_keyframe+empty_moov')
                 .videoCodec('libx264')
                 .format('mp4')
-                .videoFilters(`drawtext=fontfile=${quicksand}:text='${watermarkText}':fontsize=24:fontcolor=black@0.1:x=(w-text_w)/2:y=(h-text_h)/2`)
+                .videoFilters(`drawtext=fontfile=${quicksand}:text='${watermarkText}':fontsize=${fontsize}:fontcolor=white@0.3:borderw=2:bordercolor=black@0.3:x=(w-text_w)/2:y=(h-text_h)/2`)
                 .on('start', () => console.log('Adding watermark to video...'))
                 .on('error', err => {
                 console.error('Error while processing video:', err);

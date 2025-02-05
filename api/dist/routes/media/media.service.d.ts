@@ -15,8 +15,9 @@ export declare class MediaService {
     constructor(repository: MediaRepository, USER: UserRepository, auth: AuthService, mailer: MailerService, VIEW: ViewRepository);
     upload(email: string, file: Express.Multer.File, metadata: string): Promise<DefaultResponse<string>>;
     createAccess({ filename, url, email, }: MediaCreateAccess): Promise<DefaultResponse>;
-    readMetadata(token: string): Promise<DefaultResponse>;
+    check(filename: string): Promise<DefaultResponse<any>>;
     read(res: Response, token: string): Promise<void>;
+    readMetadata(token: string): Promise<DefaultResponse>;
     private createWaterMark;
     private generateHTML;
     private getMediaPath;

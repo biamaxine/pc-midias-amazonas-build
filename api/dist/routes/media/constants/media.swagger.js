@@ -31,19 +31,22 @@ exports.mediaApiResponse = {
         CREATED: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.CREATED, [
             'Acesso à Midia de Depoimento criado com sucesso.',
         ]),
-        NOT_FOUND: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.NOT_FOUND, [
-            'Mídia não foi encontrada.',
-        ]),
         INTERNAL_SERVER_ERROR: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.INTERNAL_SERVER_ERROR, [
             'Mídia registrada no DB mas não foi encontrada nos arquivos.',
             'Não foi possível criar o usuário.',
             'Não foi possível enviar o email de resposta à solicitação.',
         ]),
     },
-    read: {
-        NOT_FOUND: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.NOT_FOUND, [
-            'Mídia não foi encontrada.',
+    check: {
+        OK: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.OK, ['Verificação de Mídia: SUCESSO.']),
+        BAD_REQUEST: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.BAD_REQUEST, [
+            'Nome de mídia inválido.',
         ]),
+        INTERNAL_SERVER_ERROR: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.INTERNAL_SERVER_ERROR, [
+            'Mídia registrada no DB mas não foi encontrada nos arquivos.',
+        ]),
+    },
+    read: {
         INTERNAL_SERVER_ERROR: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.INTERNAL_SERVER_ERROR, [
             'Mídia registrada no DB mas não foi encontrada nos arquivos.',
         ]),

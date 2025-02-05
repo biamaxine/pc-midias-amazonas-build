@@ -7,6 +7,7 @@ export declare class MediaController {
     constructor(service: MediaService);
     UPLOAD(email: string, file: Express.Multer.File, metadata: string): Promise<DefaultResponse<string>>;
     CREATE_ACCESS(dto: MediaCreateAccess): Promise<DefaultResponse>;
+    CHECK(filename: string): Promise<DefaultResponse>;
     READ(res: Response, token: string): Promise<void>;
     READ_METADATA(token: string): Promise<DefaultResponse>;
 }

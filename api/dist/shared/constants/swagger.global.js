@@ -36,6 +36,9 @@ exports.globalApiReponse = {
     USER_NOT_FOUND: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.NOT_FOUND, [
         'Usuário não foi encontrado.',
     ]),
+    MEDIA_NOT_FOUND: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.NOT_FOUND, [
+        'Mídia não foi encontrada.',
+    ]),
     EMAIL_CONFLICT: (0, create_api_response_function_1.createApiResponse)(common_1.HttpStatus.CONFLICT, [
         'Email já cadastrado.',
     ]),

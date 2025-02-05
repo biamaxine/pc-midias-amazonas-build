@@ -11,5 +11,6 @@ export declare const globalApiReponse: {
     ADMINISTRATIVE_ROUTE: import("@nestjs/swagger").ApiResponseOptions;
     EMAIL_NOT_REGISTERED: import("@nestjs/swagger").ApiResponseOptions;
     USER_NOT_FOUND: import("@nestjs/swagger").ApiResponseOptions;
+    MEDIA_NOT_FOUND: import("@nestjs/swagger").ApiResponseOptions;
     EMAIL_CONFLICT: import("@nestjs/swagger").ApiResponseOptions;
 };

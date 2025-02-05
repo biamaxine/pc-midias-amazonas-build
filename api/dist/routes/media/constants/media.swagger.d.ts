@@ -11,11 +11,14 @@ export declare const mediaApiResponse: {
     };
     createMediaAcess: {
         CREATED: import("@nestjs/swagger").ApiResponseOptions;
-        NOT_FOUND: import("@nestjs/swagger").ApiResponseOptions;
+        INTERNAL_SERVER_ERROR: import("@nestjs/swagger").ApiResponseOptions;
+    };
+    check: {
+        OK: import("@nestjs/swagger").ApiResponseOptions;
+        BAD_REQUEST: import("@nestjs/swagger").ApiResponseOptions;
         INTERNAL_SERVER_ERROR: import("@nestjs/swagger").ApiResponseOptions;
     };
     read: {
-        NOT_FOUND: import("@nestjs/swagger").ApiResponseOptions;
         INTERNAL_SERVER_ERROR: import("@nestjs/swagger").ApiResponseOptions;
     };
     readMetadata: {
